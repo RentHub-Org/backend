@@ -1,0 +1,62 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  wallet_address String @id
+  pinned_data    File[]
+  Quotas         Quota[]
+}
+
+model File {
+  hash             String   @id
+  type             FileType @default(FILE)
+  custom_extension String   @default("")
+  size             Int
+  pinned_at        DateTime
+  expires_in_days  Int
+  createdBy        User      @relation(fields: [createdBy_wallet_address], references: [wallet_address])
+  createdBy_wallet_address String
+  updated_on       DateTime
+  created_on       DateTime @default(now())
+}
+
+enum FileType {
+  FILE
+  IMAGE
+  JSON
+  TEXT
+  CUSTOM
+}
+
+model Quota{
+  quotaId           String @id @default(uuid())
+  owner             User      @relation(fields: [createdFor_wallet_address], references: [wallet_address])
+  createdFor_wallet_address  String
+
+  quotaType         QuotaType
+  //for Qt_1
+  credits           BigInt
+
+}
+
+enum QuotaType {
+  Qt_1 // credit based
+  Qt_2 // 
+  Qt_3
+}
+
+
+
+
