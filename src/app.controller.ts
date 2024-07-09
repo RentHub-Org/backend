@@ -1,9 +1,11 @@
-import { Body, Controller, Get, Param, Post, Req, UploadedFile, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Req, Res, UploadedFile, UseInterceptors } from '@nestjs/common';
 import { AppService } from './app.service';
 import { BtfsNodeService } from './btfs-node/btfs-node.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 import axios from 'axios';
 import FormData from 'form-data';
+import { Express } from 'express';
+import { Response } from 'express';
 
 @Controller()
 export class AppController {
@@ -24,62 +26,22 @@ export class AppController {
 
   @Post("/testOut")
   @UseInterceptors(FileInterceptor('file'))
-  async uploadFile(@UploadedFile() file: Express.Multer.File) {
-    const formData = new FormData();
-    formData.append('file', file.buffer, file.originalname);
-
-    const config = {
-      method: 'post',
-      url: 'http://localhost:5001/api/v1/add?w=true',
-      headers: {
-        ...formData.getHeaders(),
-      },
-      data: formData,
-    };
-
-    try {
-      const response = await axios(config);
-      return response.data;
-    } catch (error) {
-      console.error(error);
-      throw error;
-    }
+  async uploadFile(@Req() req:any,@UploadedFile() file: Express.Multer.File) {
+    return this.btfsService.freeTierUpload(file);
   }
-  freeTier(@Req() req:Request){
-    return this.btfsService.freeTierUpload(req);
-  }
+
   @Get("/gateway/:id/:cid")
-  gateway(@Param("id") id: string, @Param("cid") cid: string ):any{
-    //check if the id exist in the db for a user.. and count the free tier for that user....
-    this.btfsService.freeTierGet(cid);
+  async gateway(@Param("id") id: string, @Param("cid") cid: string, @Res() res: Response):Promise<any>{
+    const serviceResponse = await this.btfsService.freeTierGet(cid);
+    console.log(serviceResponse.headers);
+    Object.keys(serviceResponse.headers).forEach((key) => {
+      res.setHeader(key, serviceResponse.headers[key]);
+    });
+
+    // Send the response
+    return res.send(serviceResponse.data);
+    // return this.btfsService.freeTierGet(cid);
   }
 }
 
 
-
-@Controller('upload')
-export class UploadController {
-  @Post()
-  @UseInterceptors(FileInterceptor('file'))
-  async uploadFile(@UploadedFile() file: Express.Multer.File) {
-    const formData = new FormData();
-    formData.append('file', file.buffer, file.originalname);
-
-    const config = {
-      method: 'post',
-      url: 'http://localhost:5001/api/v1/add?w=true',
-      headers: {
-        ...formData.getHeaders(),
-      },
-      data: formData,
-    };
-
-    try {
-      const response = await axios(config);
-      return response.data;
-    } catch (error) {
-      console.error(error);
-      throw error;
-    }
-  }
-}

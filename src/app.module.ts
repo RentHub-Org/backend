@@ -3,13 +3,15 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { BtfsNodeModule } from './btfs-node/btfs-node.module';
 // import { ConfigModule } from './config/config.module';
-import { MulterModule } from './multer/multer.module';
+import { MulterModule } from '@nestjs/platform-express';
+
 
 @Module({
   imports: [
     BtfsNodeModule,
-    MulterModule, 
-    // ConfigModule
+    MulterModule.register({
+      dest: './uploads',
+    }),
   ],
   controllers: [AppController],
   providers: [AppService],
