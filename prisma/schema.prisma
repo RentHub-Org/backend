@@ -14,22 +14,31 @@ datasource db {
 }
 
 model User {
-  wallet_address String @id
-  pinned_data    File[]
-  Quotas         Quota[]
+  wallet_address String          @id
+  credits        BigInt         @default(0)
+  rentedFiles    File[]
+  recharges      Bills[]
+  GatewayRoutes  GatewayRoutes[]
+  telegramId     TelegramEndPoints[]
+}
+
+model GatewayRoutes {
+  route                    String @unique @default(uuid())
+  createdBy                User   @relation(fields: [createdBy_wallet_address], references: [wallet_address])
+  createdBy_wallet_address String
 }
 
 model File {
-  hash             String   @id
-  type             FileType @default(FILE)
-  custom_extension String   @default("")
-  size             Int
-  pinned_at        DateTime
-  expires_in_days  Int
-  createdBy        User      @relation(fields: [createdBy_wallet_address], references: [wallet_address])
+  hash                     String   @id
+  
+  size                     BigInt
+  expires_in_days          Int
+  createdBy                User     @relation(fields: [createdBy_wallet_address], references: [wallet_address])
   createdBy_wallet_address String
-  updated_on       DateTime
-  created_on       DateTime @default(now())
+  //for fetching status of file
+  rentralStatusId          String
+  updated_on               DateTime
+  created_on               DateTime @default(now())
 }
 
 enum FileType {
@@ -40,23 +49,17 @@ enum FileType {
   CUSTOM
 }
 
-model Quota{
-  quotaId           String @id @default(uuid())
-  owner             User      @relation(fields: [createdFor_wallet_address], references: [wallet_address])
-  createdFor_wallet_address  String
-
-  quotaType         QuotaType
-  //for Qt_1
-  credits           BigInt
-
+model Bills {
+  billId                  String @id @default(uuid())
+  recipient               User   @relation(fields: [createdFor_wallet_address], references: [wallet_address])
+  payableAmount           BigInt
+  createdFor_wallet_address String
+  credits                 BigInt
+  created_on              DateTime @default(now())
 }
 
-enum QuotaType {
-  Qt_1 // credit based
-  Qt_2 // 
-  Qt_3
+model TelegramEndPoints{
+  username              String @unique()
+  owner                 User @relation(fields: [nameHolder], references: [wallet_address])
+  nameHolder            String
 }
-
-
-
-

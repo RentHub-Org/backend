@@ -32,15 +32,12 @@ export class AppController {
 
   @Get("/gateway/:id/:cid")
   async gateway(@Param("id") id: string, @Param("cid") cid: string, @Res() res: Response):Promise<any>{
-    const serviceResponse = await this.btfsService.freeTierGet(cid);
-    console.log(serviceResponse.headers);
+    const serviceResponse: any = await this.btfsService.freeTierGet(cid)
     Object.keys(serviceResponse.headers).forEach((key) => {
       res.setHeader(key, serviceResponse.headers[key]);
     });
-
-    // Send the response
+    res.setHeader('Content-Type', serviceResponse.headers['content-type'] || 'application/octet-stream');
     return res.send(serviceResponse.data);
-    // return this.btfsService.freeTierGet(cid);
   }
 }
 
