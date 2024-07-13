@@ -16,29 +16,9 @@ export class BtfsNodeService {
   
   ){}
 
-  addBinaryToBtfsNode(){
-
-  }
-
-  addJsonToBtfsNode(jsonData: string){
-    // var data = new FormData();
-    // data.append('file', jsonData);
-    // const response = this.httpService.post("http://localhost:5001/api/v1"+"/add",{
-    //   headers: { 
-    //   ...data.getHeaders()
-    //   },
-    //   data : data
-    // })
-    // console.log(response);
-    // return "added";
-
-  }
-  pinTOBtfs(){}
-
   async freeTierUpload(file: Express.Multer.File){
     const molterFilePath = __dirname + "\\..\\..\\" + file.path;
     const stream = fs.createReadStream(molterFilePath);
-    console.log(stream);
     const formData = new FormData();
 
     formData.append('file', stream, file.originalname);
@@ -47,7 +27,7 @@ export class BtfsNodeService {
       ...formData.getHeaders(),
     };
     return firstValueFrom(
-      this.httpService.post('http://localhost:5001/api/v1/add?w=true', formData,{ headers }).pipe(
+      this.httpService.post('http://localhost:5001/api/v1/add?', formData,{ headers }).pipe(
         map((res) => {
           if(res.status == HttpStatus.BAD_REQUEST){
             throw new HttpException("The file is too large to be uploaded. Please try to upload a smaller file.", HttpStatus.BAD_REQUEST)
@@ -99,4 +79,68 @@ export class BtfsNodeService {
     ));
     return redirectResponse;
   }
+
+  //todo : remove the default days, and add validation
+  async remtalUpload(file: Express.Multer.File, to_bc: any, rentForDays: number = 30){
+    if(to_bc == undefined){
+      to_bc = false;
+    }
+    const molterFilePath = __dirname + "\\..\\..\\" + file.path;
+    const stream = fs.createReadStream(molterFilePath);
+    const formData = new FormData();
+
+    formData.append('file', stream, file.originalname);
+
+    const headers = {
+      ...formData.getHeaders(),
+    };
+    const nodeAddRes = await firstValueFrom(
+      this.httpService.post(`http://localhost:5001/api/v1/add?to-blockchain=${to_bc}`, formData,{ headers }).pipe(
+        map((res) => {
+          if(res.status == HttpStatus.BAD_REQUEST){
+            throw new HttpException("The file is too large to be uploaded. Please try to upload a smaller file.", HttpStatus.BAD_REQUEST)
+          }
+          else if(res.status == HttpStatus.OK){
+            return res.data;
+          }
+          //failed req for adding to node...
+          throw new HttpException("unexpected error in adding to node.", HttpStatus.INTERNAL_SERVER_ERROR)
+        }),
+        tap(()=>{
+          fs.unlinkSync(molterFilePath); // delete the stored file....
+        })
+      )
+    );
+    //adding is  done now trying to upload...
+    //put a validation on rentForDays to be greater than 30......
+    return await lastValueFrom(
+      this.httpService.post(`http://localhost:5001/api/v1/storage/upload?arg=${nodeAddRes.Hash}&len=${rentForDays}`).pipe(
+        catchError((err) => {
+          //todo: save error for future ref, 
+          //todo remove the file from the node...
+          this.httpService.post(`http://localhost:5001/api/v1/files/rm?arg=${nodeAddRes.hash}`, {});
+          throw new HttpException("Error while uploding the file.... retry later", HttpStatus.INTERNAL_SERVER_ERROR);
+        }),
+        map((res) => {
+          return res.data;
+        })
+      )
+    )
+  }
+
+  //todo: under validation.... not working
+  async uploadStatus(session_id: string){
+    console.log(session_id);
+    return await lastValueFrom(
+      this.httpService.get(`http://localhost:5001/api/v1/storage/upload/status?session-id=${session_id}`).pipe(
+        map((res) => {
+          return res.data;
+        })
+      )
+    )
+  
+  }
+
+  //status  route.. here....
+  // http://127.0.0.1:5001/api/v1/storage/upload/status?
 }

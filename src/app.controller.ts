@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, Req, Res, UploadedFile, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Query, Req, Res, UploadedFile, UseInterceptors } from '@nestjs/common';
 import { AppService } from './app.service';
 import { BtfsNodeService } from './btfs-node/btfs-node.service';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -26,7 +26,7 @@ export class AppController {
 
   @Post("/testOut")
   @UseInterceptors(FileInterceptor('file'))
-  async uploadFile(@Req() req:any,@UploadedFile() file: Express.Multer.File) {
+  async uploadFile(@UploadedFile() file: Express.Multer.File) {
     return this.btfsService.freeTierUpload(file);
   }
 
@@ -39,6 +39,18 @@ export class AppController {
     res.setHeader('Content-Type', serviceResponse.headers['content-type'] || 'application/octet-stream');
     return res.send(serviceResponse.data);
   }
+
+  @Post("upload")
+  @UseInterceptors(FileInterceptor('file'))
+  async rentalUploadFile(@Query("to-blockchain") to_bc:any,@Query("days") days: number, @UploadedFile() file: Express.Multer.File) {
+    return this.btfsService.remtalUpload(file, to_bc, days);
+  }
+
+  @Get("status/:cid")
+  uploadStatus(@Param("cid") session_id: string){
+    return this.btfsService.uploadStatus(session_id);
+  }
+
 }
 
 
