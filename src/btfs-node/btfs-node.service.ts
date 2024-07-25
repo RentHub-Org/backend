@@ -1,10 +1,8 @@
 import { HttpService } from '@nestjs/axios';
-import { ConsoleLogger, HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { catchError, firstValueFrom, lastValueFrom, map, of, tap } from 'rxjs';
 import * as fs from 'fs';
-import * as path from 'path';
 import * as FormData from 'form-data';
-import { Readable } from 'stream';
 // import { ConfigService } from 'src/config/config.service';
 
 @Injectable()
@@ -94,9 +92,9 @@ export class BtfsNodeService {
     const headers = {
       ...formData.getHeaders(),
     };
-    const nodeAddRes = await firstValueFrom(
+    const nodeAddRes:any = await firstValueFrom(
       this.httpService.post(`http://localhost:5001/api/v1/add?to-blockchain=${to_bc}`, formData,{ headers }).pipe(
-        map((res) => {
+        map((res:any) => {
           if(res.status == HttpStatus.BAD_REQUEST){
             throw new HttpException("The file is too large to be uploaded. Please try to upload a smaller file.", HttpStatus.BAD_REQUEST)
           }
@@ -111,29 +109,36 @@ export class BtfsNodeService {
         })
       )
     );
+    
+    console.log("node add res: ",nodeAddRes);
     //adding is  done now trying to upload...
     //put a validation on rentForDays to be greater than 30......
+
     return await lastValueFrom(
       this.httpService.post(`http://localhost:5001/api/v1/storage/upload?arg=${nodeAddRes.Hash}&len=${rentForDays}`).pipe(
         catchError((err) => {
           //todo: save error for future ref, 
           //todo remove the file from the node...
-          this.httpService.post(`http://localhost:5001/api/v1/files/rm?arg=${nodeAddRes.hash}`, {});
+          this.httpService.post(`http://localhost:5001/api/v1/files/rm?arg=${nodeAddRes.Hash}`, {});
           throw new HttpException("Error while uploding the file.... retry later", HttpStatus.INTERNAL_SERVER_ERROR);
         }),
-        map((res) => {
+        map((res:any) => {
           return res.data;
         })
       )
     )
   }
 
-  //todo: under validation.... not working
   async uploadStatus(session_id: string){
     console.log(session_id);
+    const formData = new FormData();
+    formData.append('session-id', session_id);
+    const headers = {
+      ...formData.getHeaders(),
+    };
     return await lastValueFrom(
-      this.httpService.get(`http://localhost:5001/api/v1/storage/upload/status?session-id=${session_id}`).pipe(
-        map((res) => {
+      this.httpService.post(`http://localhost:5001/api/v1/storage/upload/status`,formData,{ ...headers}).pipe(
+        map((res:any)=> {
           return res.data;
         })
       )

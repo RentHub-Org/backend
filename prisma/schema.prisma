@@ -14,27 +14,28 @@ datasource db {
 }
 
 model User {
-  wallet_address String          @id
+  address        String          @id
   credits        BigInt         @default(0)
   rentedFiles    File[]
   recharges      Bills[]
   GatewayRoutes  GatewayRoutes[]
   telegramId     TelegramEndPoints[]
+  apiKeys        ApiKeys[]
 }
 
 model GatewayRoutes {
   route                    String @unique @default(uuid())
-  createdBy                User   @relation(fields: [createdBy_wallet_address], references: [wallet_address])
-  createdBy_wallet_address String
+  createdBy                User   @relation(fields: [createdBy_email], references: [address])
+  createdBy_email String
 }
 
 model File {
   hash                     String   @id
-  
+  sessionId                String  
   size                     BigInt
   expires_in_days          Int
-  createdBy                User     @relation(fields: [createdBy_wallet_address], references: [wallet_address])
-  createdBy_wallet_address String
+  createdBy                User     @relation(fields: [createdBy_email], references: [address])
+  createdBy_email String
   //for fetching status of file
   rentralStatusId          String
   updated_on               DateTime
@@ -51,15 +52,22 @@ enum FileType {
 
 model Bills {
   billId                  String @id @default(uuid())
-  recipient               User   @relation(fields: [createdFor_wallet_address], references: [wallet_address])
+  recipient               User   @relation(fields: [createdFor_email], references: [address])
+  txnHash                 String
   payableAmount           BigInt
-  createdFor_wallet_address String
+  createdFor_email String
   credits                 BigInt
   created_on              DateTime @default(now())
 }
 
 model TelegramEndPoints{
   username              String @unique()
-  owner                 User @relation(fields: [nameHolder], references: [wallet_address])
+  owner                 User @relation(fields: [nameHolder], references: [address])
+  nameHolder            String
+}
+
+model ApiKeys{
+  key                   String @id @default(uuid())
+  owner                 User @relation(fields: [nameHolder], references: [address])
   nameHolder            String
 }

@@ -43,6 +43,10 @@ export class AppController {
   @Post("upload")
   @UseInterceptors(FileInterceptor('file'))
   async rentalUploadFile(@Query("to-blockchain") to_bc:any,@Query("days") days: number, @UploadedFile() file: Express.Multer.File) {
+    if(to_bc == undefined || days == undefined){
+      console.log(to_bc, days);
+      return "hehe";
+    }
     return this.btfsService.remtalUpload(file, to_bc, days);
   }
 
