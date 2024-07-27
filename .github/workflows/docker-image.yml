@@ -16,8 +16,8 @@ jobs:
       env: 
         DOCKER_USERNAME: ${{secrets.DOCKER_USERNAME}}
         DOCKER_PASSWORD: ${{secrets.DOCKER_PASSWORD}}
-      run: docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
+      run: echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin
     - name: Build the Docker image
-      run: docker build -t TBD-core .
+      run: docker build -t priyanshoe/TBD-core:latest .
     - name: Push to docker hub
       run: docker push priyanshoe/TBD-core:latest
