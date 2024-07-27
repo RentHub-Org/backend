@@ -11,13 +11,15 @@ export class UserController {
 
     @Post("deleteTelegramHandle")
     async deleteTelegramHandle(@Body() body: deleteTelegramUsernameDto): Promise<any> {
-        return await this.userService.deleteTelegramHandle(body.signature, body.message, body.telegramHandle );
+        return await this.userService.deleteTelegramHandle(body.signature, body.message );
     }
 
     @Post("addTelegramHandle")
     async addTelegramHandle(@Body() body: deleteTelegramUsernameDto): Promise<any> {
-        return await this.userService.addTelegramHandle(body.signature, body.message, body.telegramHandle );
+        return await this.userService.addTelegramHandle(body.signature, body.message );
     }
+
+    
 
     
 }

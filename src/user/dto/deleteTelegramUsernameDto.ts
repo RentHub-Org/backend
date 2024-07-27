@@ -8,8 +8,4 @@ export class deleteTelegramUsernameDto{
     @IsString()
     @IsNotEmpty()
     message: string;
-
-    @IsString()
-    @IsNotEmpty()
-    telegramHandle: string;
 }

@@ -8,10 +8,14 @@ export class UserService {
     constructor() {
         this.prisma = new PrismaClient();
     }
-    async deleteTelegramHandle( signature: string, message: string, telegram: string): Promise<string> {
+    async deleteTelegramHandle( signature: string, message: string): Promise<string> {
         const sigAddress = utils.message.verifyMessage(message, signature);
         if(sigAddress !== message.split(":")[0]){
             throw new HttpException("Signature is invalid", 400);
+        }
+        const telegram = message.split(":")[1];
+        if(telegram === undefined){
+            throw new HttpException("Telegram handle is required", 400);
         }
         //scaning the db here...
         const user = await this.prisma.telegramEndPoints.findFirst({
@@ -20,7 +24,7 @@ export class UserService {
             }
         })
         if(!user){
-            throw new HttpException("Telegramhandle not found", 404);
+            throw new HttpException("Telegram handle not found", 404);
         }    
         if(user.nameHolder !== sigAddress){
             throw new HttpException("onwership mismatch of the handle.", 400);
@@ -33,10 +37,14 @@ export class UserService {
         return "Telegram handle deleted successfully";
     }
 
-    async addTelegramHandle( signature: string, message: string, telegram: string): Promise<any> {
+    async addTelegramHandle( signature: string, message: string): Promise<any> {
         const sigAddress = utils.message.verifyMessage(message, signature);
         if(sigAddress !== message.split(":")[0]){
             throw new HttpException("Signature is invalid", 400);
+        }
+        const telegram = message.split(":")[1];
+        if(telegram === undefined){
+            throw new HttpException("Telegram handle is required", 400);
         }
         const user = await this.prisma.telegramEndPoints.findFirst({
             where: {
