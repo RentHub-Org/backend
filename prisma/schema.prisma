@@ -30,16 +30,22 @@ model GatewayRoutes {
 }
 
 model File {
-  hash                     String   @id
+  id                       Int    @id @unique @default(autoincrement())
+  hash                     String
   sessionId                String  
   size                     BigInt
   expires_in_days          Int
   createdBy                User     @relation(fields: [createdBy_email], references: [address])
   createdBy_email String
-  //for fetching status of file
   rentralStatusId          String
   updated_on               DateTime
   created_on               DateTime @default(now())
+  listType                 ListType
+}
+
+enum ListType {
+  DEV
+  RENTAL
 }
 
 enum FileType {

@@ -22,9 +22,11 @@ jobs:
     
     - name: Delete old Docker image
       run: |
-        old_image_id=$(sudo docker images priyanshoe/tbd-core --format "{{.ID}}" | tail -n +2)
-        if [ -n "$old_image_id" ]; then
-          sudo docker rmi -f $old_image_id
+        old_image_ids=$(sudo docker images --format "{{.Repository}}:{{.ID}}" | grep "^priyanshoe" | cut -d: -f2)
+        if [ -n "$old_image_ids" ]; then
+          for image_id in $old_image_ids; do
+            sudo docker rmi -f $image_id
+          done
         fi
 
     - name: Run docker container

@@ -3,6 +3,8 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { catchError, firstValueFrom, lastValueFrom, map, of, tap } from 'rxjs';
 import * as fs from 'fs';
 import * as FormData from 'form-data';
+import { hash } from 'crypto';
+
 // import { ConfigService } from 'src/config/config.service';
 
 @Injectable()
@@ -109,24 +111,30 @@ export class BtfsNodeService {
         })
       )
     );
-    
-    console.log("node add res: ",nodeAddRes);
     //adding is  done now trying to upload...
     //put a validation on rentForDays to be greater than 30......
+    if(rentForDays < 30){
+      throw new HttpException("The minimum rental period is 30 days.", HttpStatus.BAD_REQUEST);
+    }
 
-    return await lastValueFrom(
+    const response =  await lastValueFrom(
       this.httpService.post(`http://localhost:5001/api/v1/storage/upload?arg=${nodeAddRes.Hash}&len=${rentForDays}`).pipe(
         catchError((err) => {
-          //todo: save error for future ref, 
-          //todo remove the file from the node...
+          //todo: save error for future refrence...
           this.httpService.post(`http://localhost:5001/api/v1/files/rm?arg=${nodeAddRes.Hash}`, {});
           throw new HttpException("Error while uploding the file.... retry later", HttpStatus.INTERNAL_SERVER_ERROR);
         }),
-        map((res:any) => {
-          return res.data;
-        })
+          map((res:any) => {
+            return res.data;
+          })
+        )
       )
-    )
+      const fileContext = {
+        days: rentForDays,
+        ...nodeAddRes,  
+        sessionId: response.ID   
+      }
+      return fileContext;
   }
 
   async uploadStatus(session_id: string){

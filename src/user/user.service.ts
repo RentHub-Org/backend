@@ -1,13 +1,15 @@
 import { HttpException, Injectable } from '@nestjs/common';
+import { JwtValidationService } from "../jwt/jwt/jwt.service";
 import { PrismaClient } from '@prisma/client';
 import { utils } from "tronweb"; 
+import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
 export class UserService {
-    private prisma: PrismaClient;
-    constructor() {
-        this.prisma = new PrismaClient();
-    }
+    constructor(
+        private readonly prisma: PrismaService, // Inject PrismaService
+        readonly jwtValidationService: JwtValidationService
+    ) {}
     async deleteTelegramHandle( signature: string, message: string): Promise<string> {
         const sigAddress = utils.message.verifyMessage(message, signature);
         if(sigAddress !== message.split(":")[0]){
@@ -61,5 +63,19 @@ export class UserService {
             }
         })
         return "Telegram handle added successfully";
+    }
+
+    async getTelegramHandles(token:string){
+        const user = this.jwtValidationService.decodeToken(token);
+        if(user === null){
+            throw new HttpException("Invalid token", 400);
+        }
+        const telegramHandles = await this.prisma.telegramEndPoints.findMany({
+            where: {
+                //@ts-ignore
+                nameHolder: user.address.base56
+            }
+        })
+        return telegramHandles;
     }
 }
