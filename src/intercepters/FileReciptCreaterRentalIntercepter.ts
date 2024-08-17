@@ -16,9 +16,11 @@ export class FileReciptCreaterRentalInterceptor implements NestInterceptor {
             const fileSize = request.Size;
             const sessionId = request.sessionId;
             const forDays = request.days;
+            const name = request.Name;
             const newFile = await this.prisma.file.create({
                 data: {
                     hash: fileHash as string,
+                    name: name as string,
                     sessionId: sessionId as string,
                     size: fileSize as number,
                     expires_in_days: parseInt(forDays) as number,

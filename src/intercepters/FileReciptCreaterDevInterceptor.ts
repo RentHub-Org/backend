@@ -1,4 +1,5 @@
 import { Injectable, NestInterceptor, ExecutionContext, CallHandler } from '@nestjs/common';
+import { constrainedMemory } from 'process';
 import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { PrismaService } from 'src/prisma/prisma.service';
@@ -14,10 +15,11 @@ export class FileReciptCreaterDevInterceptor implements NestInterceptor {
             const userAddress: string = request.userAddress as string;
             const fileHash = request.file_hash;
             const fileSize = request.file_size;
-
+            const name = request.file_name;
             const newFile = await this.prisma.file.create({
                 data: {
                     hash: fileHash as string,
+                    name: name as string,
                     sessionId: "dev_env_file",
                     size: fileSize as number,
                     expires_in_days: 0,

@@ -58,6 +58,7 @@ export class AppController {
     //setting context for post request processes...
     req.file_hash = returnDataFreeTier.Hash;
     req.file_size = returnDataFreeTier.Size;
+    req.file_name = returnDataFreeTier.Name;
     return returnDataFreeTier;    
   }
 
@@ -83,8 +84,8 @@ export class AppController {
 
   // FETCH - routs
   
-  @Get("/gateway/:id/:cid")
-  async gateway(@Param("id") id: string, @Param("cid") cid: string, @Res() res: Response):Promise<any>{
+  @Get("/gateway/:cid")
+  async gateway(@Param("cid") cid: string, @Res() res: Response):Promise<any>{
     const serviceResponse: any = await this.btfsService.freeTierGet(cid)
     Object.keys(serviceResponse.headers).forEach((key) => {
       res.setHeader(key, serviceResponse.headers[key]);

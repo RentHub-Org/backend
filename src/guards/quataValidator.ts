@@ -10,7 +10,7 @@ export class QuotaValidatorGuard implements CanActivate {
 
     async canActivate(context: ExecutionContext): Promise<boolean> {
         const request = context.switchToHttp().getRequest();
-        let _days: number = parseInt(request.query.days.toSTring());
+        let _days: number = parseInt(request.query.days.toString());
         if(!_days || _days < 30){
           _days = 30;
         }

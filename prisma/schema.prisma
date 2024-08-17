@@ -32,6 +32,7 @@ model GatewayRoutes {
 model File {
   id                       Int    @id @unique @default(autoincrement())
   hash                     String
+  name                     String @default("")
   sessionId                String  
   size                     BigInt
   expires_in_days          Int
