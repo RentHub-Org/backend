@@ -75,6 +75,7 @@ model TelegramEndPoints{
 
 model ApiKeys{
   key                   String @id @default(uuid())
+  tagName               String @unique()
   owner                 User @relation(fields: [nameHolder], references: [address])
   nameHolder            String
 }
