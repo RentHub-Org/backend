@@ -50,7 +50,7 @@ export class AppController {
   // PROD - route
   @Post("/tronSig/testout")
   @UseInterceptors(FileInterceptor('file'))
-  @UseGuards(QuotaValidatorGuard) // this is to be removed because this is a fre tirrre uploding.
+  // @UseGuards(QuotaValidatorGuard) // this is to be removed because this is a fre tirrre uploding.
   @UseGuards(CheckTronSigGuard)
   @UseInterceptors(DeductCreditsInterceptor, FileReciptCreaterDevInterceptor)
   async uploadCheckFile(@UploadedFile() file: Express.Multer.File, @Req() req) {
@@ -86,7 +86,7 @@ export class AppController {
   // PROD - SDK
   @Post("/sdk/dev")
   @UseInterceptors(FileInterceptor('file'))
-  @UseGuards(QuotaValidatorGuard) // this is to be removed because this is a fre tier uploding.
+  // @UseGuards(QuotaValidatorGuard) // this is to be removed because this is a fre tier uploding.
   @UseGuards(ApiKeyValidatorGuard) // guard that finds the user in the context.
   @UseInterceptors(DeductCreditsInterceptor, FileReciptCreaterDevInterceptor)
   async uploadCheckFileSDK(@UploadedFile() file: Express.Multer.File, @Req() req) {
@@ -100,7 +100,7 @@ export class AppController {
   }
 
   @Post("/sdk/dev/pinJson")
-  @UseGuards(QuotaValidatorGuard) // this is to be removed because this is a fre tier uploding.
+  // @UseGuards(QuotaValidatorGuard) // this is to be removed because this is a fre tier uploding.
   @UseGuards(ApiKeyValidatorGuard) // guard that finds the user in the context.
   @UseInterceptors(DeductCreditsInterceptor, FileReciptCreaterDevInterceptor)
   async uploadJsonViaSdk(@Body('json') json: any, @Req() req) {
