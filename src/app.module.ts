@@ -8,8 +8,6 @@ import { UserModule } from './user/user.module';
 import { JwtModule } from './jwt/jwt.module';
 import { PrismaService } from './prisma/prisma.service';
 
-
-
 @Module({
   imports: [
     BtfsNodeModule,
@@ -20,9 +18,6 @@ import { PrismaService } from './prisma/prisma.service';
     JwtModule,
   ],
   controllers: [AppController],
-  providers: [
-    AppService,
-    PrismaService,
-  ],
+  providers: [AppService, PrismaService],
 })
 export class AppModule {}

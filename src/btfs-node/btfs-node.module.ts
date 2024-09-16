@@ -9,6 +9,6 @@ import { HttpModule } from '@nestjs/axios';
     // ConfigModule
   ],
   providers: [BtfsNodeService],
-  exports: [BtfsNodeService]
+  exports: [BtfsNodeService],
 })
 export class BtfsNodeModule {}
