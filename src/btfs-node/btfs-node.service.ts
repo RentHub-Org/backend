@@ -2,6 +2,7 @@ import { HttpService } from '@nestjs/axios';
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import * as FormData from 'form-data';
 import * as fs from 'fs';
+import * as path from 'path';
 import { catchError, firstValueFrom, lastValueFrom, map, of, tap } from 'rxjs';
 import { Readable } from 'stream';
 
@@ -15,7 +16,7 @@ export class BtfsNodeService {
   ) {}
 
   async freeTierUpload(file: Express.Multer.File) {
-    const molterFilePath = __dirname + '\\..\\..\\' + file.path;
+    const molterFilePath = path.join(__dirname, '..', '..', file.path);
     const stream = fs.createReadStream(molterFilePath);
     const formData = new FormData();
 
@@ -107,7 +108,7 @@ export class BtfsNodeService {
     if (to_bc == undefined) {
       to_bc = false;
     }
-    const molterFilePath = __dirname + '\\..\\..\\' + file.path;
+    const molterFilePath = path.join(__dirname, '..', '..', file.path);
     const stream = fs.createReadStream(molterFilePath);
     const formData = new FormData();
 
@@ -161,6 +162,7 @@ export class BtfsNodeService {
         .pipe(
           catchError((err) => {
             //todo: save error for future refrence...
+            console.error(err);
             this.httpService.post(
               `http://localhost:5001/api/v1/files/rm?arg=${nodeAddRes.Hash}`,
               {},
@@ -265,6 +267,7 @@ export class BtfsNodeService {
         .pipe(
           catchError((err) => {
             //todo: save error for future refrence...
+            console.error(err);
             this.httpService.post(
               `http://localhost:5001/api/v1/files/rm?arg=${nodeAddRes.Hash}`,
               {},
