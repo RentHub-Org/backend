@@ -36,26 +36,6 @@ export class AppController {
     return this.appService.getHello();
   }
 
-  @Post('/testOut')
-  @UseInterceptors(FileInterceptor('file'))
-  async uploadFile(@UploadedFile() file: Express.Multer.File) {
-    return this.btfsService.freeTierUpload(file);
-  }
-
-  @Post('upload')
-  @UseInterceptors(FileInterceptor('file'))
-  async rentalUploadFile(
-    @Query('to-blockchain') to_bc: any,
-    @Query('days') days: number,
-    @UploadedFile() file: Express.Multer.File,
-  ) {
-    if (to_bc == undefined || days == undefined) {
-      console.log(to_bc, days);
-      return 'hehe';
-    }
-    return this.btfsService.remtalUpload(file, to_bc, days);
-  }
-
   // PROD - route
   @Post('/tronSig/testout')
   @UseInterceptors(FileInterceptor('file'))

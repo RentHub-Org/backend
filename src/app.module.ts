@@ -12,7 +12,7 @@ import { PrismaService } from './prisma/prisma.service';
   imports: [
     BtfsNodeModule,
     MulterModule.register({
-      dest: './uploads',
+      dest: './dist/uploads',
     }),
     UserModule,
     JwtModule,

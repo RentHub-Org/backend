@@ -14,21 +14,26 @@ export class ApiKeyValidatorGuard implements CanActivate {
         if (!apiKey) {
             throw new HttpException("Can't validate user: No apiKey provided", HttpStatus.SERVICE_UNAVAILABLE);
         }
+        try{
 
-        const data = await this.prisma.apiKeys.findFirst({
-            where: {
-                key: apiKey as string,
-            },
-            include: {
-                owner: true,  // Include related owner data
-            },
-        });
-
-        if (!data) {
-            throw new HttpException("Invalid API key", HttpStatus.UNAUTHORIZED);
+            const data = await this.prisma.apiKeys.findFirst({
+                where: {
+                    key: apiKey as string,
+                },
+                include: {
+                    owner: true,  // Include related owner data
+                },
+            });
+            
+            if (!data) {
+                throw new HttpException("Invalid API key", HttpStatus.UNAUTHORIZED);
+            }
+            console.log("data",data);
+            request.userAddress = data.owner.address;
+        }catch(err){
+            console.log(err);
+            throw new HttpException("Unable to reach DB.", HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        console.log("data",data);
-        request.userAddress = data.owner.address;
         return true;
     }
 }
