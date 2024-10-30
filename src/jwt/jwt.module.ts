@@ -10,7 +10,7 @@ import { JwtValidationService } from './jwt/jwt.service';
   imports: [
     NestJwtModule.registerAsync({
       useFactory: async () => ({
-        secret: "jwt_t0k3n_Gener@t0r",
+        secret: 'jwt_t0k3n_Gener@t0r',
         signOptions: { expiresIn: '60m' },
       }),
     }),

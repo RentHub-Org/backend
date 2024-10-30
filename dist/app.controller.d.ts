@@ -6,10 +6,8 @@ export declare class AppController {
     private readonly btfsService;
     constructor(appService: AppService, btfsService: BtfsNodeService);
     getHello(): string;
-    uploadFile(file: Express.Multer.File): Promise<any>;
-    rentalUploadFile(to_bc: any, days: number, file: Express.Multer.File): Promise<any>;
     uploadCheckFile(file: Express.Multer.File, req: any): Promise<any>;
-    rentalUploadFileViaSig(to_bc: any, days: number, file: Express.Multer.File, req: any): Promise<any>;
+    rentalUploadFileViaSig(to_bc: any, days: number, fileSize: number, file: Express.Multer.File, req: any): Promise<true | "hehe">;
     uploadCheckFileSDK(file: Express.Multer.File, req: any): Promise<any>;
     uploadJsonViaSdk(json: any, req: any): Promise<any>;
     rentalUploadFileViaSDK(to_bc: any, days: number, file: Express.Multer.File, req: any): Promise<any>;

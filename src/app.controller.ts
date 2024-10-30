@@ -39,7 +39,7 @@ export class AppController {
   // PROD - route
   @Post('/tronSig/testout')
   @UseInterceptors(FileInterceptor('file'))
-  @UseGuards(QuotaValidatorGuard) // this is to be removed because this is a fre tirrre uploding.
+  // @UseGuards(QuotaValidatorGuard) // this is to be removed because this is a fre tirrre uploding.
   @UseGuards(CheckTronSigGuard)
   @UseInterceptors(DeductCreditsInterceptor, FileReciptCreaterDevInterceptor)
   async uploadCheckFile(@UploadedFile() file: Express.Multer.File, @Req() req) {
@@ -60,21 +60,25 @@ export class AppController {
   async rentalUploadFileViaSig(
     @Query('to-blockchain') to_bc: any,
     @Query('days') days: number,
+    @Query('fileSize') fileSize: number,
     @UploadedFile() file: Express.Multer.File,
     @Req() req: any,
   ) {
-    if (to_bc == undefined || days == undefined) {
+    if (to_bc == undefined || days == undefined || fileSize == undefined) {
       console.log(to_bc, days);
       return 'hehe';
     }
+
     const data = await this.btfsService.remtalUpload(file, to_bc, days);
+    console.log('data ; ', data.Size);
+
     console.log('data💜💜: ', data);
     req.Hash = data.Hash;
     req.days = data.days;
     req.sessionId = data.sessionId;
     req.Size = data.Size;
     req.Name = data.Name;
-    return data;
+    return true;
   }
 
   // PROD - SDK

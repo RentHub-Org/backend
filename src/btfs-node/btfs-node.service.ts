@@ -9,15 +9,15 @@ import { Readable } from 'stream';
 // import { ConfigService } from 'src/config/config.service';
 
 @Injectable()
-export class BtfsNodeService { 
+export class BtfsNodeService {
   constructor(
     private readonly httpService: HttpService,
     // private readonly configService: ConfigService,
   ) {}
 
   async freeTierUpload(file: Express.Multer.File) {
-    const molterFilePath = __dirname+ '/../../'+ file.path;
-    console.log("file name btfs-node freties upload: path: ",molterFilePath);
+    const molterFilePath = __dirname + '/../../' + file.path;
+    console.log('file name btfs-node freties upload: path: ', molterFilePath);
     const stream = fs.createReadStream(molterFilePath);
     const formData = new FormData();
 

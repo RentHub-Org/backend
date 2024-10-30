@@ -31,16 +31,6 @@ let AppController = class AppController {
     getHello() {
         return this.appService.getHello();
     }
-    async uploadFile(file) {
-        return this.btfsService.freeTierUpload(file);
-    }
-    async rentalUploadFile(to_bc, days, file) {
-        if (to_bc == undefined || days == undefined) {
-            console.log(to_bc, days);
-            return 'hehe';
-        }
-        return this.btfsService.remtalUpload(file, to_bc, days);
-    }
     async uploadCheckFile(file, req) {
         const returnDataFreeTier = await this.btfsService.freeTierUpload(file);
         console.log(returnDataFreeTier);
@@ -49,19 +39,20 @@ let AppController = class AppController {
         req.file_name = returnDataFreeTier.Name;
         return returnDataFreeTier;
     }
-    async rentalUploadFileViaSig(to_bc, days, file, req) {
-        if (to_bc == undefined || days == undefined) {
+    async rentalUploadFileViaSig(to_bc, days, fileSize, file, req) {
+        if (to_bc == undefined || days == undefined || fileSize == undefined) {
             console.log(to_bc, days);
             return 'hehe';
         }
         const data = await this.btfsService.remtalUpload(file, to_bc, days);
+        console.log('data ; ', data.Size);
         console.log('data💜💜: ', data);
         req.Hash = data.Hash;
         req.days = data.days;
         req.sessionId = data.sessionId;
         req.Size = data.Size;
         req.Name = data.Name;
-        return data;
+        return true;
     }
     async uploadCheckFileSDK(file, req) {
         const returnDataFreeTier = await this.btfsService.freeTierUpload(file);
@@ -140,27 +131,8 @@ __decorate([
     __metadata("design:returntype", String)
 ], AppController.prototype, "getHello", null);
 __decorate([
-    (0, common_1.Post)('/testOut'),
-    (0, common_1.UseInterceptors)((0, platform_express_1.FileInterceptor)('file')),
-    __param(0, (0, common_1.UploadedFile)()),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object]),
-    __metadata("design:returntype", Promise)
-], AppController.prototype, "uploadFile", null);
-__decorate([
-    (0, common_1.Post)('upload'),
-    (0, common_1.UseInterceptors)((0, platform_express_1.FileInterceptor)('file')),
-    __param(0, (0, common_1.Query)('to-blockchain')),
-    __param(1, (0, common_1.Query)('days')),
-    __param(2, (0, common_1.UploadedFile)()),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object, Number, Object]),
-    __metadata("design:returntype", Promise)
-], AppController.prototype, "rentalUploadFile", null);
-__decorate([
     (0, common_1.Post)('/tronSig/testout'),
     (0, common_1.UseInterceptors)((0, platform_express_1.FileInterceptor)('file')),
-    (0, common_1.UseGuards)(quataValidator_1.QuotaValidatorGuard),
     (0, common_1.UseGuards)(tronSignatureValidator_1.CheckTronSigGuard),
     (0, common_1.UseInterceptors)(CreditDeductionIntercepter_1.DeductCreditsInterceptor, FileReciptCreaterDevInterceptor_1.FileReciptCreaterDevInterceptor),
     __param(0, (0, common_1.UploadedFile)()),
@@ -177,10 +149,11 @@ __decorate([
     (0, common_1.UseInterceptors)(CreditDeductionIntercepter_1.DeductCreditsInterceptor, FileReciptCreaterRentalIntercepter_1.FileReciptCreaterRentalInterceptor),
     __param(0, (0, common_1.Query)('to-blockchain')),
     __param(1, (0, common_1.Query)('days')),
-    __param(2, (0, common_1.UploadedFile)()),
-    __param(3, (0, common_1.Req)()),
+    __param(2, (0, common_1.Query)('fileSize')),
+    __param(3, (0, common_1.UploadedFile)()),
+    __param(4, (0, common_1.Req)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object, Number, Object, Object]),
+    __metadata("design:paramtypes", [Object, Number, Number, Object, Object]),
     __metadata("design:returntype", Promise)
 ], AppController.prototype, "rentalUploadFileViaSig", null);
 __decorate([
