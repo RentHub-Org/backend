@@ -159,6 +159,7 @@ export class BtfsNodeService {
       this.httpService
         .post(
           `http://localhost:5001/api/v1/storage/upload?arg=${nodeAddRes.Hash}&len=${rentForDays}`,
+          null,
         )
         .pipe(
           catchError((err) => {
