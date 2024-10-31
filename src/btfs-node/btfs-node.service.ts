@@ -265,6 +265,7 @@ export class BtfsNodeService {
       this.httpService
         .post(
           `http://localhost:5001/api/v1/storage/upload?arg=${nodeAddRes.Hash}&len=${rentForDays}`,
+          null,
         )
         .pipe(
           catchError((err) => {
@@ -272,7 +273,7 @@ export class BtfsNodeService {
             console.error(err);
             this.httpService.post(
               `http://localhost:5001/api/v1/files/rm?arg=${nodeAddRes.Hash}`,
-              {},
+              null,
             );
             throw new HttpException(
               'Error while uploding the file.... retry later',
