@@ -41,7 +41,7 @@ export class AppController {
   @UseInterceptors(FileInterceptor('file'))
   // @UseGuards(QuotaValidatorGuard) // this is to be removed because this is a fre tirrre uploding.
   @UseGuards(CheckTronSigGuard)
-  @UseInterceptors(DeductCreditsInterceptor, FileReciptCreaterDevInterceptor)
+  @UseInterceptors(FileReciptCreaterDevInterceptor)
   async uploadCheckFile(@UploadedFile() file: Express.Multer.File, @Req() req) {
     const returnDataFreeTier = await this.btfsService.freeTierUpload(file);
     console.log(returnDataFreeTier);
@@ -69,8 +69,16 @@ export class AppController {
       return 'hehe';
     }
 
-    const data = await this.btfsService.remtalUpload(file, to_bc, days);
-    console.log('data ; ', data.Size);
+    const creditRequired = req?.creditRequired;
+
+    console.log('request.creditRequired : ', creditRequired);
+
+    const data = await this.btfsService.remtalUpload(
+      file,
+      to_bc,
+      days,
+      creditRequired,
+    );
 
     console.log('data💜💜: ', data);
     req.Hash = data.Hash;
@@ -78,7 +86,7 @@ export class AppController {
     req.sessionId = data.sessionId;
     req.Size = data.Size;
     req.Name = data.Name;
-    return true;
+    return data;
   }
 
   // PROD - SDK
