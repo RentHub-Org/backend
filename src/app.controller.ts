@@ -130,6 +130,7 @@ export class AppController {
   async rentalUploadFileViaSDK(
     @Query('to-blockchain') to_bc: any,
     @Query('days') days: number,
+    @Query('fileSize') fileSize: number,
     @UploadedFile() file: Express.Multer.File,
     @Req() req: any,
   ) {
@@ -137,7 +138,12 @@ export class AppController {
       console.log(to_bc, days);
       return 'to_bc or days not found for rental upload.';
     }
-    const data = await this.btfsService.remtalUpload(file, to_bc, days, {});
+    const data = await this.btfsService.remtalUpload(
+      file,
+      to_bc,
+      days,
+      fileSize,
+    );
     console.log('data💜💜: ', data);
     req.Hash = data.Hash;
     req.days = data.days;
