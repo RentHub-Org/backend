@@ -1,12 +1,12 @@
 import {
-  Injectable,
   CanActivate,
   ExecutionContext,
   HttpException,
   HttpStatus,
+  Injectable,
 } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { calculateRequiredCost } from './creditCalculator';
+import { calculateRentalCost } from './creditCalculator';
 
 @Injectable()
 export class QuotaValidatorGuard implements CanActivate {
@@ -63,12 +63,12 @@ export class QuotaValidatorGuard implements CanActivate {
 
     const { credits } = user;
     // we have to passs the file size and the days for the credit calculation.... 🥹🥹
-    const creditRequired = calculateRequiredCost(fileSize, _days);
-    console.log('credits Rqued : ', creditRequired);
+    const rentalCost = calculateRentalCost(fileSize, _days);
+    console.log('credits Rqued : ', rentalCost?.creditsCost);
     //setting the credits required.
-    request.creditRequired = creditRequired;
+    request.rentalCost = rentalCost;
 
-    if (credits < creditRequired) {
+    if (credits < rentalCost?.creditsCost) {
       throw new HttpException(
         'Not sufficient credit present.',
         HttpStatus.NOT_ACCEPTABLE,

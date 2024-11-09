@@ -69,15 +69,15 @@ export class AppController {
       return 'hehe';
     }
 
-    const creditRequired = req?.creditRequired;
+    const rentalCost = req?.rentalCost;
 
-    console.log('request.creditRequired : ', creditRequired);
+    console.log('request.creditRequired : ', rentalCost);
 
     const data = await this.btfsService.remtalUpload(
       file,
       to_bc,
       days,
-      creditRequired,
+      rentalCost,
     );
 
     console.log('data💜💜: ', data);
@@ -137,7 +137,7 @@ export class AppController {
       console.log(to_bc, days);
       return 'to_bc or days not found for rental upload.';
     }
-    const data = await this.btfsService.remtalUpload(file, to_bc, days);
+    const data = await this.btfsService.remtalUpload(file, to_bc, days, {});
     console.log('data💜💜: ', data);
     req.Hash = data.Hash;
     req.days = data.days;

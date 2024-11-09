@@ -19,8 +19,8 @@ export class DeductCreditsInterceptor implements NestInterceptor {
       tap(async () => {
         const request = context.switchToHttp().getRequest();
         const userAddress = request.userAddress;
-        const creditToDeduct = request.creditRequired;
-        console.log('creditToDeduct', creditToDeduct);
+        const rentalCost = request.rentalCost;
+        console.log('creditToDeduct', rentalCost);
 
         if (userAddress) {
           try {
@@ -41,14 +41,16 @@ export class DeductCreditsInterceptor implements NestInterceptor {
                 );
               }
 
-              const newCredits = user.credits - BigInt(creditToDeduct);
+              const newCredits =
+                Math.ceil(Number(user.credits)) -
+                Math.ceil(Number(rentalCost.creditsCost));
               console.log('newCredits : ', newCredits);
 
               await prismaTxn.user.update({
                 where: { address: userAddress },
                 data: {
                   credits: {
-                    decrement: creditToDeduct,
+                    decrement: rentalCost.creditsCost,
                   },
                 },
               });

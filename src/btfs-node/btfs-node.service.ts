@@ -104,9 +104,9 @@ export class BtfsNodeService {
     file: Express.Multer.File,
     to_bc: any,
     rentForDays: number = 30,
-    creditRequired: number = 0,
+    rentalCost: any,
   ) {
-    if (to_bc == undefined || creditRequired <= 0) {
+    if (to_bc == undefined || rentalCost.creditsCost <= 0) {
       to_bc = false;
     }
     const molterFilePath = path.join(__dirname, '..', '..', file.path);
@@ -179,12 +179,11 @@ export class BtfsNodeService {
           }),
         ),
     );
-    console.log('sdfsaf : ', creditRequired);
     const fileContext = {
       days: rentForDays,
       ...nodeAddRes,
       sessionId: response.ID,
-      creditRequired,
+      rentalCost,
     };
     return fileContext;
   }
